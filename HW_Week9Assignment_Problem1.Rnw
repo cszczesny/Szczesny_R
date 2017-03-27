@@ -1,0 +1,53 @@
+\documentclass{article}
+
+\begin{document}
+
+Week 9 Homework Assignment:
+03/31/2017
+Problem 1:
+
+<<>>=
+library(rstan)
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+getwd()
+@
+
+<<>>=
+df = read.csv("MTH396_CI_assignment_data1.csv")
+str(df)
+
+y=df$y
+N = nrow(df)
+@
+
+
+<<>>=
+library(shinystan)
+stanfit = stan("HW_Week9_Weibull.stan")
+launch_shinystan(stanfit)
+print(stanfit)                        #print a summary of the results
+
+pd = extract(stanfit)
+str(pd)
+
+mean(pd$sigma)
+quantile(pd$sigma, c(.025,.25,.5,.75,.975))
+@
+
+<<>>=
+q50a = qweibull(.5,pd$alpha,pd$sigma)
+quantile(q50a,c(.025,.5,.975))
+@
+
+<<>>=
+# to get the 95% confidence interval for the 90th percentile of the distribution
+q90a = qweibull(.90,3,pd$alpha,pd$sigma)
+str(q90a)
+quantile(q90a,c(.025,.5,.975))
+@
+
+<<>>=
+print(get_stanmodel(stanfit))
+@
+\end{document}
